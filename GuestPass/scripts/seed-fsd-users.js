@@ -10,41 +10,32 @@ const pool = new Pool({
 
 const SALT_ROUNDS = 12;
 
-function generatePassword(length = 8) {
-  const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let retVal = "";
-  for (let i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-}
-
 const usersToSeed = [
-  { name: 'Brigadier Tippu Karim (Retd.)', email: 'tippu.karim@fsdcity.pk', role: 'executive', title: 'CEO', position: 'ceo', department: 'Head Office Lahore' },
-  { name: 'Saeen Irfan', email: 'saeen.irfan@fsdcity.pk', role: 'executive', title: 'Head of Accounts & Finance', position: 'cfo', department: 'Head Office Lahore' },
-  { name: 'Faisal Luqman', email: 'faisal.luqman@fsdcity.pk', role: 'executive', title: 'General Manager Finance', position: 'md_partner', department: 'Head Office Lahore' },
-  { name: 'Usman Niaz', email: 'usman.niaz@fsdcity.pk', role: 'executive', title: 'CSD Head', position: 'director_operations', department: 'Head Office Lahore' },
-  { name: 'Waseem Sadiq', email: 'waseem.sadiq@fsdcity.pk', role: 'executive', title: 'Digital Head', position: 'tech_consultant', department: 'Head Office Lahore' },
+  { name: 'Brigadier Tippu Karim (Retd.)', email: 'tippu.karim@fsdcity.pk', role: 'executive', title: 'CEO', position: 'ceo', department: 'Head Office Lahore', password: 'tippu123' },
+  { name: 'Saeen Irfan', email: 'saeen.irfan@fsdcity.pk', role: 'executive', title: 'Head of Accounts & Finance', position: 'cfo', department: 'Head Office Lahore', password: 'irfan123' },
+  { name: 'Faisal Luqman', email: 'faisal.luqman@fsdcity.pk', role: 'executive', title: 'General Manager Finance', position: 'md_partner', department: 'Head Office Lahore', password: 'luqman123' },
+  { name: 'Usman Niaz', email: 'usman.niaz@fsdcity.pk', role: 'executive', title: 'CSD Head', position: 'director_operations', department: 'Head Office Lahore', password: 'usman123' },
+  { name: 'Waseem Sadiq', email: 'waseem.sadiq@fsdcity.pk', role: 'executive', title: 'Digital Head', position: 'tech_consultant', department: 'Head Office Lahore', password: 'waseem123' },
 
-  { name: 'Col. Irfan', email: 'col.irfan@fsdcity.pk', role: 'executive', title: 'Head of Administration', position: 'director_faisalabad', department: 'Site Office Faisalabad' },
-  { name: 'Malik Younas', email: 'malik.younas@fsdcity.pk', role: 'executive', title: 'Head of Sales', position: 'consultant', department: 'Site Office Faisalabad' },
+  { name: 'Col. Irfan', email: 'col.irfan@fsdcity.pk', role: 'executive', title: 'Head of Administration', position: 'director_faisalabad', department: 'Site Office Faisalabad', password: 'colirfan123' },
+  { name: 'Malik Younas', email: 'malik.younas@fsdcity.pk', role: 'executive', title: 'Head of Sales', position: 'consultant', department: 'Site Office Faisalabad', password: 'younas123' },
 
-  { name: 'Muhammad Bin Waris Gillani', email: 'muhammad.gillani@fsdcity.pk', role: 'executive', title: 'Executive Director', position: 'chairman_partner', department: 'Executive Directors' },
-  { name: 'Mian Muhammad Ali Moeen', email: 'ali.moeen@fsdcity.pk', role: 'executive', title: 'Executive Director', position: 'chairman_partner', department: 'Executive Directors' },
+  { name: 'Muhammad Bin Waris Gillani', email: 'muhammad.gillani@fsdcity.pk', role: 'executive', title: 'Executive Director', position: 'chairman_partner', department: 'Executive Directors', password: 'gillani123' },
+  { name: 'Mian Muhammad Ali Moeen', email: 'ali.moeen@fsdcity.pk', role: 'executive', title: 'Executive Director', position: 'chairman_partner', department: 'Executive Directors', password: 'moeen123' },
 
-  { name: 'Khalid Noon', email: 'khalid.noon@fsdcity.pk', role: 'executive', title: 'Head of PND', position: 'md_partner', department: 'Joined Departments - GCK' },
-  { name: 'Col. Mazhar', email: 'col.mazhar@fsdcity.pk', role: 'executive', title: 'Head of Land', position: 'consultant', department: 'Joined Departments - GCK' },
-  { name: 'Amjad Lawyer', email: 'amjad.lawyer@fsdcity.pk', role: 'executive', title: 'Head of Legal', position: 'consultant', department: 'Joined Departments - GCK' },
-  { name: 'Rashid Thakur', email: 'rashid.thakur@fsdcity.pk', role: 'executive', title: 'Head of Procurement', position: 'consultant', department: 'Joined Departments - GCK' },
-  { name: 'Abdul Rehman', email: 'abdul.rehman@fsdcity.pk', role: 'executive', title: 'Head of IT', position: 'tech_consultant', department: 'Joined Departments - GCK' },
-  { name: 'Huda Javed', email: 'huda.javed@fsdcity.pk', role: 'executive', title: 'Head of HR', position: 'consultant', department: 'Joined Departments - GCK' },
-  { name: 'Sophia Qadeer', email: 'sophia.qadeer@fsdcity.pk', role: 'executive', title: 'Head of Marketing', position: 'consultant', department: 'Joined Departments - GCK' },
+  { name: 'Khalid Noon', email: 'khalid.noon@fsdcity.pk', role: 'executive', title: 'Head of PND', position: 'md_partner', department: 'Joined Departments - GCK', password: 'khalid123' },
+  { name: 'Col. Mazhar', email: 'col.mazhar@fsdcity.pk', role: 'executive', title: 'Head of Land', position: 'consultant', department: 'Joined Departments - GCK', password: 'mazhar123' },
+  { name: 'Amjad Lawyer', email: 'amjad.lawyer@fsdcity.pk', role: 'executive', title: 'Head of Legal', position: 'consultant', department: 'Joined Departments - GCK', password: 'amjad123' },
+  { name: 'Rashid Thakur', email: 'rashid.thakur@fsdcity.pk', role: 'executive', title: 'Head of Procurement', position: 'consultant', department: 'Joined Departments - GCK', password: 'rashid123' },
+  { name: 'Abdul Rehman', email: 'abdul.rehman@fsdcity.pk', role: 'executive', title: 'Head of IT', position: 'tech_consultant', department: 'Joined Departments - GCK', password: 'abdul123' },
+  { name: 'Huda Javed', email: 'huda.javed@fsdcity.pk', role: 'executive', title: 'Head of HR', position: 'consultant', department: 'Joined Departments - GCK', password: 'huda123' },
+  { name: 'Sophia Qadeer', email: 'sophia.qadeer@fsdcity.pk', role: 'executive', title: 'Head of Marketing', position: 'consultant', department: 'Joined Departments - GCK', password: 'sophia123' },
 
   // System Roles
-  { name: 'Staff', email: 'staff@fsdcity.pk', role: 'staff', department: 'System' },
-  { name: 'Security Guard', email: 'guard@fsdcity.pk', role: 'guard', department: 'System' },
-  { name: 'Receptionist', email: 'receptionist@fsdcity.pk', role: 'receptionist', department: 'System' },
-  { name: 'System Admin', email: 'admin@fsdcity.pk', role: 'admin', department: 'System' }
+  { name: 'Staff', email: 'staff@fsdcity.pk', role: 'staff', department: 'System', password: 'staff123' },
+  { name: 'Security Guard', email: 'guard@fsdcity.pk', role: 'guard', department: 'System', password: 'guard123' },
+  { name: 'Receptionist', email: 'receptionist@fsdcity.pk', role: 'receptionist', department: 'System', password: 'reception123' },
+  { name: 'System Admin', email: 'admin@fsdcity.pk', role: 'admin', department: 'System', password: 'admin123' }
 ];
 
 async function seedDatabase() {
@@ -58,9 +49,12 @@ async function seedDatabase() {
     
     // Switch to guestpass schema
     await client.query('SET search_path TO guestpass, public');
+
+    console.log('Clearing existing users to prevent duplicate errors...');
+    await client.query('TRUNCATE TABLE users CASCADE');
     
     for (const user of usersToSeed) {
-      const password = generatePassword(10);
+      const password = user.password;
       const hash = await bcrypt.hash(password, SALT_ROUNDS);
       
       console.log(`Inserting user: ${user.name}...`);
