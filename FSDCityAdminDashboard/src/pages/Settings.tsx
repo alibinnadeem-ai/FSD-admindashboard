@@ -56,7 +56,7 @@ export default function Settings() {
     if (confirm('Are you sure you want to reset all settings to default?')) {
       // Reset to default values
       setSettings({
-        companyName: 'FSD City Construction',
+        companyName: 'Grand FSD Construction',
         timezone: 'Asia/Karachi',
         language: 'English',
         currency: 'PKR',
@@ -95,7 +95,7 @@ export default function Settings() {
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-gray-900">Settings</h1>
         <p className="mt-2 text-sm text-gray-600">
-          Manage your FSD City Admin Dashboard preferences and configurations.
+          Manage your Grand FSD Admin Dashboard preferences and configurations.
         </p>
       </div>
 
