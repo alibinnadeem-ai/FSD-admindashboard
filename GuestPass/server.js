@@ -26,8 +26,8 @@ app.use((req, res, next) => {
   const defaultOrigins = [
     'http://localhost:3000', 
     'http://localhost:3001',
-    'https://grandcityadmindashboard.vercel.app',
-    'https://grandcityadmindashboard-mjns.vercel.app'
+    'https://fsdcityadmindashboard.vercel.app',
+    'https://fsdcityadmindashboard-mjns.vercel.app'
   ];
   const corsOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || '';
   const allowedOrigins = corsOrigins 

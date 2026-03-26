@@ -417,7 +417,7 @@
 
                         // Create download link
                         const link = document.createElement('a');
-                        link.download = `GrandCity-Pass-${visit.code}.png`;
+                        link.download = `FSDCity-Pass-${visit.code}.png`;
                         link.href = dataURL;
                         link.style.display = 'none';
 
@@ -522,7 +522,7 @@ Visit Management System`;
                             <div ref={passRef} className="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-xl p-6 text-white mb-6 shadow-2xl">
                                 <div className="flex justify-between items-start mb-6">
                                     <div>
-                                        <h3 className="text-sm font-semibold opacity-90">GRAND CITY HQ</h3>
+                                        <h3 className="text-sm font-semibold opacity-90">FSD CITY HQ</h3>
                                         <p className="text-xs opacity-75">Visitor Pass</p>
                                     </div>
                                     <div className={`${statusColor} px-3 py-1 rounded-full text-xs font-bold`}>
@@ -688,10 +688,10 @@ Visit Management System`;
                     const exec = executives.find(e => e.id === selectedExec);
                     return exec?.email;
                 }
-                if (role === 'admin') return 'admin@grandcity.pk';
-                if (role === 'staff') return 'staff@grandcity.pk';
-                if (role === 'guard') return 'guard@grandcity.pk';
-                if (role === 'receptionist') return 'receptionist@grandcity.pk';
+                if (role === 'admin') return 'admin@fsdcity.pk';
+                if (role === 'staff') return 'staff@fsdcity.pk';
+                if (role === 'guard') return 'guard@fsdcity.pk';
+                if (role === 'receptionist') return 'receptionist@fsdcity.pk';
                 return null;
             };
 
