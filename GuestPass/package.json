@@ -4,6 +4,8 @@
   "description": "Comprehensive guest pass management system with QR code generation and multi-role access",
   "main": "guest-pass-system.html",
   "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
     "build": "echo 'Static site - no build needed'",
     "build:dev": "cross-env NODE_ENV=development webpack --config webpack.config.js",
     "build:staging": "cross-env NODE_ENV=staging webpack --config webpack.config.js",
