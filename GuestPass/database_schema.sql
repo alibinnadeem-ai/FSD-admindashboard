@@ -4,6 +4,36 @@
 -- PostgreSQL 15.x
 -- =====================================================
 
+-- =====================================================
+-- RESET SCHEMA (Cascading)
+-- =====================================================
+DROP TABLE IF EXISTS system_settings CASCADE;
+DROP TABLE IF EXISTS daily_stats CASCADE;
+DROP TABLE IF EXISTS weekly_reports CASCADE;
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS recurring_visits CASCADE;
+DROP TABLE IF EXISTS visit_approvals CASCADE;
+DROP TABLE IF EXISTS visits CASCADE;
+DROP TABLE IF EXISTS visitors CASCADE;
+DROP TABLE IF EXISTS executives CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+DROP TYPE IF EXISTS user_role CASCADE;
+DROP TYPE IF EXISTS executive_position CASCADE;
+DROP TYPE IF EXISTS visit_type CASCADE;
+DROP TYPE IF EXISTS visit_status CASCADE;
+DROP TYPE IF EXISTS approval_status CASCADE;
+DROP TYPE IF EXISTS audit_action CASCADE;
+DROP TYPE IF EXISTS notification_type CASCADE;
+DROP TYPE IF EXISTS notification_channel CASCADE;
+
+-- =====================================================
+-- SCHEMA SETUP
+-- =====================================================
+CREATE SCHEMA IF NOT EXISTS guestpass;
+SET search_path TO guestpass, public;
+
 -- Enable required extensions
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
@@ -538,12 +568,13 @@ INSERT INTO system_settings (setting_key, setting_value, description) VALUES
 
 -- Insert admin user
 INSERT INTO users (email, password_hash, full_name, role, is_active) VALUES
-('admin@grandcity.pk', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYPq/gkmGru', 'System Administrator', 'admin', true);
+('admin@fsdcity.pk', '$2b$12$LQv3c1yqBWVHxkd0LHAkCOYz6TtxMQJqhN8/LewY5GyYPq/gkmGru', 'System Administrator', 'admin', true);
 
 -- =====================================================
--- ROW LEVEL SECURITY (Optional)
+-- ROW LEVEL SECURITY (Commented out as current_user_id() is undefined)
 -- =====================================================
 
+/*
 -- Enable RLS
 ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE visitors ENABLE ROW LEVEL SECURITY;
@@ -566,6 +597,7 @@ CREATE POLICY staff_visits_policy ON visits
             SELECT executive_id FROM users WHERE id = current_user_id()
         )
     );
+*/
 
 -- =====================================================
 -- COMMENTS
@@ -582,6 +614,5 @@ COMMENT ON TABLE weekly_reports IS 'Pre-generated weekly compliance and analytic
 -- MAINTENANCE
 -- =====================================================
 
--- Vacuum and analyze
-VACUUM ANALYZE;
+-- Vacuum and analyze removed for compatibility with transaction blocks
 

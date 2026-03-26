@@ -15,7 +15,7 @@ app.use(express.json());
 
 // IMPORTANT: Static files middleware with redirect disabled
 // This prevents express.static from treating /api as a directory
-app.use(express.static(__dirname, { 
+app.use(express.static(__dirname, {
   redirect: false,
   index: false  // Don't serve index files for directories
 }));
@@ -24,42 +24,49 @@ app.use(express.static(__dirname, {
 app.use((req, res, next) => {
   // Get allowed origins from environment or use defaults
   const defaultOrigins = [
-    'http://localhost:3000', 
+    'http://localhost:3000',
     'http://localhost:3001',
-    'https://fsdcityadmindashboard.vercel.app',
-    'https://fsdcityadmindashboard-mjns.vercel.app'
+    'https://fsd-admindashboard.vercel.app',
+    'https://fsd-admindashboard-guestpass.vercel.app/'
   ];
   const corsOrigins = process.env.CORS_ORIGINS || process.env.CORS_ORIGIN || '';
-  const allowedOrigins = corsOrigins 
+  const allowedOrigins = corsOrigins
     ? corsOrigins.split(',').map(o => o.trim())
     : defaultOrigins;
-  
+
   const origin = req.headers.origin;
-  
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
+
+  // Also include the current origin if it's a vercel domain and we're in prod
+  const isVercel = origin && origin.endsWith('.vercel.app');
+
+  if (allowedOrigins.includes(origin) || isVercel) {
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
     res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   }
-  
-  // Allow framing from allowed origins using CSP
-  const frameAncestors = allowedOrigins.join(' ');
+
+  // Allow framing from allowed origins + the request's own origin if it's vercel
+  const ancestors = [...new Set([...allowedOrigins, 'https://*.vercel.app'])];
+  const frameAncestors = ancestors.join(' ');
+
   res.setHeader('Content-Security-Policy', `frame-ancestors 'self' ${frameAncestors}`);
   res.setHeader('X-Content-Type-Options', 'nosniff');
-  
+  // Specifically remove X-Frame-Options to allow CSP frame-ancestors to work
+  res.removeHeader('X-Frame-Options');
+
   // Prevent caching of HTML files to avoid serving stale code
   if (req.path.endsWith('.html') || req.path === '/') {
     res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
     res.setHeader('Pragma', 'no-cache');
     res.setHeader('Expires', '0');
   }
-  
+
   // Handle preflight requests
   if (req.method === 'OPTIONS') {
     return res.sendStatus(200);
   }
-  
+
   next();
 });
 
@@ -118,7 +125,7 @@ app.post('/api/login', async (req, res) => {
 
     // Check if account is locked
     if (user.account_locked_until && new Date(user.account_locked_until) > new Date()) {
-      return res.status(403).json({ 
+      return res.status(403).json({
         error: 'Account is locked. Please try again later.',
         lockedUntil: user.account_locked_until
       });
@@ -135,7 +142,7 @@ app.post('/api/login', async (req, res) => {
       // Increment failed login attempts
       const failedAttempts = (user.failed_login_attempts || 0) + 1;
       const lockAccount = failedAttempts >= 5;
-      
+
       if (lockAccount) {
         const lockUntil = new Date(Date.now() + 30 * 60 * 1000); // Lock for 30 minutes
         await db.query(
@@ -144,7 +151,7 @@ app.post('/api/login', async (req, res) => {
            WHERE id = $3`,
           [failedAttempts, lockUntil, user.id]
         );
-        return res.status(403).json({ 
+        return res.status(403).json({
           error: 'Account locked due to multiple failed login attempts',
           lockedUntil: lockUntil
         });
@@ -153,7 +160,7 @@ app.post('/api/login', async (req, res) => {
           'UPDATE users SET failed_login_attempts = $1 WHERE id = $2',
           [failedAttempts, user.id]
         );
-        return res.status(401).json({ 
+        return res.status(401).json({
           error: 'Invalid email or password',
           attemptsRemaining: 5 - failedAttempts
         });
@@ -209,9 +216,9 @@ app.post('/api/logout', authenticateToken, async (req, res) => {
 
 // Verify token endpoint (check if current token is valid)
 app.get('/api/auth/verify', authenticateToken, (req, res) => {
-  res.json({ 
-    valid: true, 
-    user: req.user 
+  res.json({
+    valid: true,
+    user: req.user
   });
 });
 
@@ -221,16 +228,16 @@ app.get('/api/auth/verify', authenticateToken, (req, res) => {
 app.get('/api/health', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW()');
-    res.json({ 
-      status: 'ok', 
+    res.json({
+      status: 'ok',
       database: 'connected',
-      timestamp: result.rows[0].now 
+      timestamp: result.rows[0].now
     });
   } catch (error) {
-    res.status(500).json({ 
-      status: 'error', 
+    res.status(500).json({
+      status: 'error',
       database: 'disconnected',
-      error: error.message 
+      error: error.message
     });
   }
 });
@@ -264,7 +271,7 @@ app.get('/api/visits', authenticateToken, async (req, res) => {
       LEFT JOIN users u ON e.user_id = u.id
       ORDER BY v.scheduled_date DESC, v.scheduled_time_from DESC
     `);
-    
+
     res.json(result.rows);
   } catch (error) {
     console.error('Error fetching visits:', error);
@@ -293,7 +300,7 @@ app.get('/api/executives', async (req, res) => {
 app.get('/api/visits/generate-code', authenticateToken, async (req, res) => {
   try {
     const year = new Date().getFullYear();
-    
+
     // Get the highest sequence number for current year
     const result = await db.query(`
       SELECT visit_code 
@@ -302,9 +309,9 @@ app.get('/api/visits/generate-code', authenticateToken, async (req, res) => {
       ORDER BY visit_code DESC 
       LIMIT 1
     `, [`GC-${year}-%`]);
-    
+
     let nextNumber = 1;
-    
+
     if (result.rows.length > 0) {
       // Extract number from code like "GC-2025-000123" or "GC-2025-WI000123"
       const lastCode = result.rows[0].visit_code;
@@ -313,10 +320,10 @@ app.get('/api/visits/generate-code', authenticateToken, async (req, res) => {
         nextNumber = parseInt(match[1]) + 1;
       }
     }
-    
+
     // Format: GC-YYYY-XXXXXX
     const code = `GC-${year}-${String(nextNumber).padStart(6, '0')}`;
-    
+
     console.log('Generated visit code:', code);
     res.json({ code });
   } catch (error) {
@@ -328,11 +335,11 @@ app.get('/api/visits/generate-code', authenticateToken, async (req, res) => {
 // Create new visit
 app.post('/api/visits', authenticateToken, async (req, res) => {
   let { visitor, executive_id, date, time_from, time_to, purpose, visit_type = 'scheduled' } = req.body;
-  
+
   console.log('Creating visit with data:', { visitor, executive_id, date, time_from, time_to, purpose, visit_type });
-  
+
   const client = await db.getClient();
-  
+
   try {
     // Start transaction
     await client.query('BEGIN');
@@ -387,10 +394,10 @@ app.post('/api/visits', authenticateToken, async (req, res) => {
       ORDER BY visit_code DESC 
       LIMIT 1
     `, [`GC-${year}-%`]);
-    
+
     let visitCode;
     let nextNumber = 1;
-    
+
     if (codeResult.rows.length > 0) {
       const lastCode = codeResult.rows[0].visit_code;
       const match = lastCode.match(/(\d{6})$/);
@@ -398,7 +405,7 @@ app.post('/api/visits', authenticateToken, async (req, res) => {
         nextNumber = parseInt(match[1]) + 1;
       }
     }
-    
+
     visitCode = `GC-${year}-${String(nextNumber).padStart(6, '0')}`;
     console.log('Generated visit code:', visitCode);
 
@@ -534,9 +541,9 @@ app.post('/api/visits/validate', async (req, res) => {
     `, [code]);
 
     if (result.rows.length === 0) {
-      return res.status(404).json({ 
-        valid: false, 
-        error: 'Visit not found' 
+      return res.status(404).json({
+        valid: false,
+        error: 'Visit not found'
       });
     }
 
@@ -546,24 +553,24 @@ app.post('/api/visits/validate', async (req, res) => {
     today.setHours(0, 0, 0, 0);
 
     if (visitDate < today) {
-      return res.json({ 
-        valid: false, 
+      return res.json({
+        valid: false,
         error: 'This pass has expired',
-        visit 
+        visit
       });
     }
 
     if (visit.status === 'cancelled') {
-      return res.json({ 
-        valid: false, 
+      return res.json({
+        valid: false,
         error: 'This pass has been cancelled',
-        visit 
+        visit
       });
     }
 
-    res.json({ 
-      valid: true, 
-      visit 
+    res.json({
+      valid: true,
+      visit
     });
   } catch (error) {
     console.error('Error validating visit:', error);

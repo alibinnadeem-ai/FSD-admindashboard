@@ -3,6 +3,27 @@
 -- This schema includes all tables needed to replace hardcoded data
 
 -- ============================================
+-- RESET TABLES (Cascading)
+-- ============================================
+DROP TABLE IF EXISTS dashboard_stats CASCADE;
+DROP TABLE IF EXISTS client_access CASCADE;
+DROP TABLE IF EXISTS reports CASCADE;
+DROP TABLE IF EXISTS personnel_properties CASCADE;
+DROP TABLE IF EXISTS maintenance_schedules CASCADE;
+DROP TABLE IF EXISTS properties CASCADE;
+DROP TABLE IF EXISTS vendors CASCADE;
+DROP TABLE IF EXISTS payments CASCADE;
+DROP TABLE IF EXISTS task_checklist CASCADE;
+DROP TABLE IF EXISTS task_subtasks CASCADE;
+DROP TABLE IF EXISTS tasks CASCADE;
+DROP TABLE IF EXISTS photo_comments CASCADE;
+DROP TABLE IF EXISTS photo_logs CASCADE;
+DROP TABLE IF EXISTS communications CASCADE;
+DROP TABLE IF EXISTS shifts CASCADE;
+DROP TABLE IF EXISTS projects CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+-- ============================================
 -- CORE TABLES
 -- ============================================
 
@@ -606,7 +627,7 @@ WHERE u.name = 'Irfan' AND p.id = 2
 ON CONFLICT DO NOTHING;
 
 -- Add maintenance-related vendors (if not exists)
-INSERT INTO vendors (name, category, rating, contracts, performance) VALUES
+INSERT INTO vendors (name, category, rating, active_contracts, performance) VALUES
 ('Muzzamil Electrical Services', 'Electrical', 4.8, 12, 95),
 ('Sajawal Electric Works', 'Electrical', 4.7, 8, 92),
 ('Naveed Auto Care', 'Car Maintenance', 4.9, 15, 97),
